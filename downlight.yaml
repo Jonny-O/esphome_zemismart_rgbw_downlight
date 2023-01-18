@@ -1,0 +1,89 @@
+# Zemismart-rgbw-downlight-with-DDP.yaml
+# Created by Jon O'Brien on January 18, 2023
+# Built with code assistance from Kauf HA
+
+substitutions:
+  name: downlight
+  friendly_name: Downlight
+  icon: "mdi:ceiling-light"
+
+esphome:
+  name: ${name}
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: true
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/KaufHA/common
+    components: [ ddp ]
+    refresh: always
+  - source:
+      type: git
+      url: https://github.com/KaufHA/common
+      ref: v2022.12.07.2
+    refresh: 365250d
+
+globals:
+  - id: global_forced_addr
+    type: int
+    restore_value: no
+    initial_value: '12345'
+  - id: global_quick_boot_count
+    type: int
+    restore_value: yes
+    initial_value: '0'
+
+wifi:
+  ssid: "changeme"       # Change this to your wi-fi network of choice
+  password: "changeme"   # Change this to the password of your wi-fi network of choice
+  fast_connect: on 
+
+web_server:
+  port: 80
+
+logger:
+
+api:
+  password: "changeme"    # Change this to your API password if you use one. If you don't, you should start!
+
+ota:
+  password: "changeme"    # See comment three lines up
+  
+captive_portal:
+
+my9231:
+  data_pin: GPIO13
+  clock_pin: GPIO15
+  num_channels: 4
+  num_chips: 1
+
+output:
+  - platform: my9231
+    id: output_blue
+    channel: 1
+  - platform: my9231
+    id: output_red
+    channel: 3
+  - platform: my9231
+    id: output_green
+    channel: 2
+  - platform: my9231
+    id: output_white
+    channel: 0
+
+ddp:
+
+light:
+  - platform: rgbw
+    id: my_light
+    name: ${friendly_name}
+    red: output_red
+    green: output_green
+    blue: output_blue
+    white: output_white
+    color_interlock: true # RGB or CCT
+    effects:
+      - ddp
